@@ -1859,13 +1859,19 @@
               <textarea class="input-field" id="mainSubject"
                 placeholder="Мужчина 30 лет стоит на балконе небоскрёба с видом на неоновый город в сумерках..."
                 oninput="handleInput()"></textarea>
-              <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+              <div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;">
                 <button type="button" id="translateBtn" class="btn btn-ghost"
                   style="min-width:auto;padding:6px 14px;font-size:.82em;" onclick="translateScene()">
                   🌐 Перевести на EN
                 </button>
+                <button type="button" id="enhanceBtn" class="btn btn-ghost"
+                  style="min-width:auto;padding:6px 14px;font-size:.82em; color:var(--accent-k); border-color:rgba(0,212,255,0.3);"
+                  onclick="enhancePrompt()">
+                  <span>✦</span> Улучшить AI
+                </button>
                 <span id="translateStatus" style="font-size:.78em;color:var(--text-muted);"></span>
               </div>
+
               <div class="hint">Можно писать на русском — нажмите «Перевести» для конвертации в английский. Сначала
                 «кто/что», затем «где», потом «стиль».
               </div>
@@ -4273,6 +4279,7 @@
           // STATE
           // =============================================
           let state = {
+            aiProvider: "groq", apiKey: "",
             aiModel: "", cameraBody: "", aspectRatio: "", resolution: "", purpose: "", format: "", medium: "", photoStyle: "", cinemaStyle: "", directorStyle: "", artStyle: "", filmStock: "",
             lens: "", focalLength: "", aperture: "", angle: "", shotSize: "", composition: "", quality: "",
             mood: "",
@@ -6632,6 +6639,85 @@ Three-quarter body from the left. Subject turns, looking over shoulder. Wide ang
 
             updateAll();
             notify("Всё сброшено");
+          }
+
+          // =============================================
+          // AI ENHANCE LOGIC
+          // =============================================
+
+          async function enhancePrompt() {
+            const ta = document.getElementById('mainSubject');
+            const text = ta.value.trim();
+            if (!text) { ta.placeholder = 'Сначала введите идею...'; return; }
+
+            const btn = document.getElementById('enhanceBtn');
+            const originalContent = btn.innerHTML;
+            btn.classList.add('loading');
+            btn.innerHTML = '<span>⏳</span> Улучшаю...';
+            btn.disabled = true;
+
+            try {
+              let improvedText = "";
+              // System prompt construction
+              const currentModel = state.aiModel || "General";
+              const systemPrompt = `You are a professional video prompt engineer.
+Expand this scene description into a detailed visual prompt.
+Structure: [Subject/Character details] + [Environment/Location] + [Lighting/Atmosphere] + [Action/Pose].
+Keep it concise but vivid (under 150 words). Write ONLY the improved prompt.
+Target Model: ${currentModel}
+Original idea: "${text}"`;
+
+              // Always use Groq with embedded key for simplicity
+              const keyToUse = "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";
+              improvedText = await callGroq(systemPrompt, keyToUse);
+
+              if (improvedText) {
+                ta.value = improvedText.trim();
+                // trigger simple input event to update counts if existing
+                if (window.handleInput) window.handleInput();
+                notify("Промпт улучшен");
+              }
+            } catch (e) {
+              console.error(e);
+              alert("AI Error: " + e.message);
+            }
+
+            btn.classList.remove('loading');
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+          }
+
+          async function callGemini(prompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+              })
+            });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error.message);
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          }
+
+          async function callGroq(prompt, key) {
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${key}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.7,
+                max_tokens: 1000
+              })
+            });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error.message);
+            return data.choices?.[0]?.message?.content || "";
           }
         </script>
         <div class="notification success" id="notification">Всё сброшено</div>
