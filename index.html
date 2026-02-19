@@ -10,7 +10,7 @@
   <title>VPE Prompt Builder 2026 — v3.1 Fixed</title>
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-  <link href="./VPE Prompt Builder 2026 — v3.1 Fixed_files/css2" rel="stylesheet">
+  <link id="css2LocalLink" href="./VideoPrompt/css2" rel="stylesheet">
   <style>
     *,
     *::before,
@@ -1604,8 +1604,8 @@
   </style>
 </head>
 
-<body><div style="background: rgb(45, 31, 0); color: rgb(253, 203, 110); padding: 8px 16px; font-size: 0.82em; text-align: center; border-bottom: 1px solid rgb(253, 203, 110); position: sticky; top: 0px; z-index: 9999;">📁 Локальный режим (file://) — перевод и шрифты недоступны. Для полного функционала откройте через веб-сервер.</div>
-  <div class="orb orb1"></div>
+<body>
+<div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
   <div class="wrap">
@@ -3339,12 +3339,10 @@
           // INIT
           // =============================================
           document.addEventListener("DOMContentLoaded", function () {
-            // Detect file:// and warn user about limited functionality
-            if (window.location.protocol === "file:") {
-              var offlineBar = document.createElement("div");
-              offlineBar.style.cssText = "background:#2d1f00;color:#fdcb6e;padding:8px 16px;font-size:.82em;text-align:center;border-bottom:1px solid #fdcb6e;position:sticky;top:0;z-index:9999;";
-              offlineBar.innerHTML = "📁 Локальный режим (file://) — перевод и шрифты недоступны. Для полного функционала откройте через веб-сервер.";
-              document.body.insertBefore(offlineBar, document.body.firstChild);
+            // Local fallback for css2 when opened directly from disk.
+            var css2 = document.getElementById("css2LocalLink");
+            if (css2 && window.location.protocol === "file:") {
+              css2.href = "file:///C:/Users/TOT/Documents/Grav4/VideoPrompt/css2";
             }
             initPresets();
             bindEvents();
@@ -3534,12 +3532,7 @@
             xhr.onerror = function () {
               status.textContent = "❌ Нет сети";
               status.style.color = "var(--red, #ff7675)";
-              // Detect file:// protocol
-              if (window.location.protocol === "file:") {
-                notify("Перевод недоступен при открытии из файла. Откройте через веб-сервер или используйте онлайн.", "err");
-              } else {
-                notify("Ошибка сети — проверьте интернет", "err");
-              }
+              notify("Ошибка сети/CORS при переводе — проверьте интернет и доступ к api.mymemory.translated.net", "err");
               btn.disabled = false;
               setTimeout(function () { status.textContent = ""; }, 5000);
             };
@@ -3557,11 +3550,7 @@
             } catch (e) {
               status.textContent = "❌ Заблокировано";
               status.style.color = "var(--red, #ff7675)";
-              if (window.location.protocol === "file:") {
-                notify("Перевод заблокирован при открытии из файла (file://). Откройте через http://", "err");
-              } else {
-                notify("Запрос заблокирован: " + e.message, "err");
-              }
+              notify("Запрос перевода заблокирован: " + e.message, "err");
               btn.disabled = false;
               setTimeout(function () { status.textContent = ""; }, 5000);
             }
