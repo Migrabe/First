@@ -3702,11 +3702,11 @@
                 style="margin-top:12px; margin-bottom:12px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px solid rgba(255,255,255,0.1); justify-content: space-between;">
                 <div style="display:flex; flex:1; gap:8px; align-items:center;">
                   <span style="font-size:1.2em;">🔗</span>
-                  <input type="text" id="n8nWebhookUrl" class="input-field" placeholder="Paste n8n Webhook URL here..."
-                    style="flex:1; font-size: 0.9em;">
+                  <input type="text" id="n8nWebhookUrl" class="input-field"
+                    placeholder="Вставьте сюда Webhook URL из n8n..." style="flex:1; font-size: 0.9em;">
                   <button class="btn"
                     style="background: linear-gradient(45deg, #FF6B6B, #F06595); color:white; border:none; font-weight:bold;"
-                    id="sendToN8nBtn">🚀 Send to n8n</button>
+                    id="sendToN8nBtn">🚀 Отправить в n8n</button>
                 </div>
               </div>
 
@@ -7271,13 +7271,13 @@ Original idea: "${text}"`;
       document.getElementById("sendToN8nBtn").addEventListener("click", async () => {
         const webhookUrl = document.getElementById("n8nWebhookUrl").value.trim();
         if (!webhookUrl) {
-          alert("Please enter an n8n Webhook URL first.");
+          alert("Пожалуйста, введите URL вебхука n8n.");
           return;
         }
 
         const btn = document.getElementById("sendToN8nBtn");
         const originalText = btn.innerHTML;
-        btn.innerHTML = "⏳ Sending...";
+        btn.innerHTML = "⏳ Отправка...";
         btn.disabled = true;
 
         try {
@@ -7285,7 +7285,7 @@ Original idea: "${text}"`;
           const promptText = document.getElementById("promptOutput").innerText;
           const jsonPayload = buildJson();
 
-          const payload = {
+const payload = {
             timestamp: new Date().toISOString(),
             prompt: promptText,
             data: jsonPayload
@@ -7298,7 +7298,7 @@ Original idea: "${text}"`;
           });
 
           if (response.ok) {
-            btn.innerHTML = "✅ Sent!";
+            btn.innerHTML = "✅ Отправлено!";
             // Save webhook for next time
             localStorage.setItem("n8n_webhook_url", webhookUrl);
             setTimeout(() => {
@@ -7310,8 +7310,8 @@ Original idea: "${text}"`;
           }
         } catch (error) {
           console.error("N8N Error:", error);
-          alert("Error sending to n8n: " + error.message);
-          btn.innerHTML = "❌ Error";
+          alert("Ошибка отправки в n8n: " + error.message);
+          btn.innerHTML = "❌ Ошибка";
           setTimeout(() => {
             btn.innerHTML = originalText;
             btn.disabled = false;
@@ -7325,7 +7325,7 @@ Original idea: "${text}"`;
         document.getElementById("n8nWebhookUrl").value = savedWebhookN8N;
       }
 
-      // Auto-save on input
+   Auto-save on input
       document.getElementById("n8nWebhookUrl").addEventListener("input", (e) => {
         localStorage.setItem("n8n_webhook_url", e.target.value);
       });
