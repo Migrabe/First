@@ -7324,7 +7324,7 @@ Original idea: "${text}"`;
         document.getElementById("n8nWebhookUrl").value = savedWebhookN8N;
       }
 
-      Auto - save on input
+      // Auto-save on input
       document.getElementById("n8nWebhookUrl").addEventListener("input", (e) => {
         localStorage.setItem("n8n_webhook_url", e.target.value);
       });
