@@ -10,7 +10,7 @@
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VPE Prompt Builder 2026 — v3.1 Fixed</title>
+  <title>VPE Prompt Builder 2026 — v4.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
   <link id="css2LocalLink" href="./VideoPrompt/css2" rel="stylesheet">
@@ -1621,8 +1621,7 @@
           <div>
             <div class="brand-line">
               <h1>VPE Prompt Builder 2026</h1>
-              <span
-                style="color:var(--accent-k); font-family:&#39;Space Mono&#39;, monospace; font-size:0.8em;">v3.1</span>
+              style="color:var(--accent-k); font-family:&#39;Space Mono&#39;, monospace; font-size:0.8em;">v4.0</span>
             </div>
             <div class="build-note">Kling/Veo/Seedance inspired layout • Full prompt logic preserved</div>
           </div>
@@ -7285,7 +7284,7 @@ Original idea: "${text}"`;
           const promptText = document.getElementById("promptOutput").innerText;
           const jsonPayload = buildJson();
 
-const payload = {
+          const payload = {
             timestamp: new Date().toISOString(),
             prompt: promptText,
             data: jsonPayload
@@ -7325,7 +7324,7 @@ const payload = {
         document.getElementById("n8nWebhookUrl").value = savedWebhookN8N;
       }
 
-   Auto-save on input
+      Auto - save on input
       document.getElementById("n8nWebhookUrl").addEventListener("input", (e) => {
         localStorage.setItem("n8n_webhook_url", e.target.value);
       });
