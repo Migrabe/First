@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)file:///C:/Users/TOT/Downloads/video-prompt-builder_1.html -->
+<html lang="ru">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VideoPrompt — Kling 3.0 · Veo 3.1 · Seedance 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link href="./VideoPrompt — Kling 3.0 · Veo 3.1 · Seedance 2_files/css2" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #080a0f;
+      --surface: #0d111a;
+      --surface2: #131929;
+      --border: #1e2a3a;
+      --border2: #243245;
+      --text: #e8edf5;
+      --muted: #5a6a80;
+      --accent-k: #00d4ff;
+      --accent-v: #7c3aff;
+      --accent-s: #ff6b35;
+      --active: #00d4ff;
+      --glow: rgba(0, 212, 255, 0.15);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ambient orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb1 {
+      width: 500px;
+      height: 500px;
+      background: rgba(0, 212, 255, 0.06);
+      top: -100px;
+      right: -100px;
+    }
+
+    .orb2 {
+      width: 400px;
+      height: 400px;
+      background: rgba(124, 58, 255, 0.06);
+      bottom: 100px;
+      left: -100px;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 48px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .logo-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-k);
+      box-shadow: 0 0 16px var(--accent-k);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+      }
+    }
+
+    .logo-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+    }
+
+    .h1-sub {
+      color: var(--muted);
+      font-weight: 400;
+      font-size: clamp(14px, 2vw, 16px);
+      margin-top: 10px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Engine selector */
+    .engine-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 36px;
+      padding: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .engine-tab {
+      flex: 1;
+      padding: 12px 8px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .engine-tab span.name {
+      display: block;
+      font-size: 15px;
+    }
+
+    .engine-tab span.version {
+      display: block;
+      font-size: 10px;
+      font-family: 'Space Mono', monospace;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    .engine-tab.active-k {
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--accent-k);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+    }
+
+    .engine-tab.active-v {
+      background: rgba(124, 58, 255, 0.1);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 255, 0.25);
+    }
+
+    .engine-tab.active-s {
+      background: rgba(255, 107, 53, 0.1);
+      color: var(--accent-s);
+      border: 1px solid rgba(255, 107, 53, 0.25);
+    }
+
+    .engine-tab:not(.active-k):not(.active-v):not(.active-s):hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Gen type tabs */
+    .gen-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+
+    .gen-tab {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .gen-tab.active {
+      background: rgba(0, 212, 255, 0.08);
+      color: var(--accent-k);
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    /* Format + Duration row */
+    .option-grid {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .opt-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .opt-btn .icon {
+      margin-right: 6px;
+      font-size: 14px;
+    }
+
+    .opt-btn.active {
+      border-color: rgba(0, 212, 255, 0.4);
+      background: rgba(0, 212, 255, 0.08);
+      color: var(--accent-k);
+    }
+
+    .opt-btn:hover:not(.active) {
+      border-color: var(--border2);
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    /* Image upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border2);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--surface);
+      display: none;
+    }
+
+    .upload-zone.visible {
+      display: block;
+    }
+
+    .upload-zone:hover {
+      border-color: rgba(0, 212, 255, 0.4);
+      background: rgba(0, 212, 255, 0.03);
+    }
+
+    .upload-zone input {
+      display: none;
+    }
+
+    .upload-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .upload-text {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .upload-text strong {
+      color: var(--accent-k);
+    }
+
+    /* Multi-shot builder */
+    .multishot-container {
+      display: none;
+    }
+
+    .multishot-container.visible {
+      display: block;
+    }
+
+    .shot-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .shot-card:hover {
+      border-color: var(--border2);
+    }
+
+    .shot-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .shot-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      color: var(--accent-k);
+      flex-shrink: 0;
+    }
+
+    .shot-time {
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      color: var(--muted);
+    }
+
+    .shot-card textarea {
+      width: 100%;
+      padding: 14px 16px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      min-height: 80px;
+    }
+
+    .shot-card textarea::placeholder {
+      color: var(--muted);
+    }
+
+    /* Single prompt */
+    .prompt-wrap {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      transition: border-color 0.2s;
+    }
+
+    .prompt-wrap:focus-within {
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    .prompt-wrap textarea {
+      width: 100%;
+      padding: 16px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      resize: none;
+      outline: none;
+      min-height: 120px;
+    }
+
+    .prompt-wrap textarea::placeholder {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .prompt-actions {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .prompt-tag {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .prompt-tag:hover {
+      color: var(--text);
+      border-color: var(--border2);
+      background: var(--border);
+    }
+
+    .btn-enhance {
+      margin-left: auto;
+      padding: 6px 14px;
+      border-radius: 7px;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      background: rgba(0, 212, 255, 0.08);
+      color: var(--accent-k);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-enhance:hover {
+      background: rgba(0, 212, 255, 0.15);
+    }
+
+    .btn-enhance.loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* Engine-specific params */
+    .engine-params {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 500px) {
+      .engine-params {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .param-group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .param-label {
+      font-size: 10px;
+      font-family: 'Space Mono', monospace;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .param-select {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235a6a80' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .param-select:focus {
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    .param-select option {
+      background: var(--surface2);
+    }
+
+    /* Advanced section */
+    .advanced-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .advanced-toggle:hover {
+      border-color: var(--border2);
+      color: var(--text);
+    }
+
+    .toggle-arrow {
+      margin-left: auto;
+      transition: transform 0.3s;
+      font-size: 10px;
+    }
+
+    .advanced-toggle.open .toggle-arrow {
+      transform: rotate(180deg);
+    }
+
+    .advanced-body {
+      display: none;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      padding: 20px;
+      background: var(--surface);
+      margin-top: -2px;
+    }
+
+    .advanced-body.visible {
+      display: block;
+    }
+
+    .neg-prompt {
+      width: 100%;
+      padding: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      resize: none;
+      outline: none;
+      min-height: 70px;
+      transition: border-color 0.2s;
+      margin-bottom: 14px;
+    }
+
+    .neg-prompt:focus {
+      border-color: rgba(0, 212, 255, 0.2);
+      color: var(--text);
+    }
+
+    /* Output */
+    .output-section {
+      margin-top: 32px;
+      display: none;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .output-section.visible {
+      display: block;
+    }
+
+    .output-box {
+      background: var(--surface);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .output-badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      color: var(--accent-k);
+    }
+
+    .output-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+      font-family: 'Space Mono', monospace;
+      word-break: break-word;
+    }
+
+    .output-meta {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--muted);
+    }
+
+    .output-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-copy {
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      color: var(--accent-k);
+    }
+
+    .btn-copy.copied {
+      color: #4ade80;
+      border-color: rgba(74, 222, 128, 0.3);
+    }
+
+    /* Generate button */
+    .generate-btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      margin-top: 28px;
+      text-transform: uppercase;
+    }
+
+    .generate-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .generate-btn:hover::before {
+      opacity: 1;
+    }
+
+    .generate-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 40px rgba(0, 180, 216, 0.3);
+    }
+
+    .generate-btn:active {
+      transform: translateY(0);
+    }
+
+    .generate-btn.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .generate-btn .btn-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    .generate-btn.loading .spinner {
+      display: block;
+    }
+
+    .generate-btn.loading .btn-label::before {
+      content: 'Создаю промпт...';
+    }
+
+    .generate-btn:not(.loading) .btn-label::before {
+      content: '⚡ Создать промпт';
+    }
+
+    .generate-btn .btn-label {
+      min-width: 160px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Multishot single toggle */
+    .multishot-switch {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    /* Char counter */
+    .char-counter {
+      font-size: 10px;
+      font-family: 'Space Mono', monospace;
+      color: var(--muted);
+      text-align: right;
+      padding: 0 16px 10px;
+    }
+
+    /* Seedance-specific */
+    .engine-panel {
+      display: none;
+    }
+
+    .engine-panel.visible {
+      display: block;
+    }
+
+    /* Add shot btn */
+    .add-shot-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px dashed var(--border2);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+
+    .add-shot-btn:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      color: var(--accent-k);
+      background: rgba(0, 212, 255, 0.03);
+    }
+
+    .section:nth-child(2) {
+      animation-delay: 0.05s;
+    }
+
+    .section:nth-child(3) {
+      animation-delay: 0.1s;
+    }
+
+    .section:nth-child(4) {
+      animation-delay: 0.15s;
+    }
+
+    .section:nth-child(5) {
+      animation-delay: 0.2s;
+    }
+
+    .section:nth-child(6) {
+      animation-delay: 0.25s;
+    }
+
+    /* Negative prompt defaults by engine */
+    .neg-k {
+      display: block;
+    }
+
+    .neg-v {
+      display: none;
+    }
+
+    .neg-s {
+      display: none;
+    }
+
+    /* Tooltip */
+    [data-tip] {
+      position: relative;
+      cursor: help;
+    }
+
+    [data-tip]::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a2535;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      padding: 6px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+
+    [data-tip]:hover::after {
+      opacity: 1;
+    }
+  </style>
+  <style type="text/css" id="operaUserStyle"></style>
+</head>
+
+<body>
+
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="wrap">
+
+    <header>
+      <div class="logo-line">
+        <div class="logo-dot"></div>
+        <span class="logo-text">Video Prompt Builder</span>
+      </div>
+      <h1>Создай промпт<br><span style="color:var(--accent-k)">для AI-видео</span></h1>
+      <p class="h1-sub">Kling 3.0 · Veo 3.1 · Seedance 2 &nbsp;/&nbsp; Text &amp; Image to Video</p>
+    </header>
+
+    <!-- Engine selector -->
+    <div class="engine-tabs" id="engineTabs">
+      <button class="engine-tab active-k" data-engine="kling" onclick="setEngine(&#39;kling&#39;, this)">
+        <span class="name">Kling</span>
+        <span class="version">3.0</span>
+      </button>
+      <button class="engine-tab" data-engine="veo" onclick="setEngine(&#39;veo&#39;, this)">
+        <span class="name">Veo</span>
+        <span class="version">3.1</span>
+      </button>
+      <button class="engine-tab" data-engine="seedance" onclick="setEngine(&#39;seedance&#39;, this)">
+        <span class="name">Seedance</span>
+        <span class="version">2</span>
+      </button>
+    </div>
+
+    <!-- Gen type -->
+    <div class="section">
+      <div class="section-label">Тип генерации</div>
+      <div class="gen-tabs">
+        <button class="gen-tab active" onclick="setGenType(&#39;text&#39;, this)">✦ Текст → Видео</button>
+        <button class="gen-tab" onclick="setGenType(&#39;image&#39;, this)">⬡ Картинка → Видео</button>
+      </div>
+    </div>
+
+    <!-- Image upload (hidden by default) -->
+    <div class="section" id="uploadSection" style="display:none;">
+      <div class="section-label">Опорное изображение</div>
+      <div class="upload-zone visible" onclick="document.getElementById(&#39;fileInput&#39;).click()">
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">Перетащите фото или <strong>нажмите для загрузки</strong><br><span
+            style="font-size:10px;color:var(--muted)">PNG, JPG, WEBP до 20MB</span></div>
+      </div>
+      <div id="imagePreview" style="display:none; margin-top:10px; position:relative;">
+        <img id="previewImg" style="width:100%; border-radius:10px; max-height:220px; object-fit:cover;">
+        <button onclick="removeImage()"
+          style="position:absolute;top:8px;right:8px;padding:4px 10px;background:rgba(0,0,0,0.7);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:11px;cursor:pointer;font-family:&#39;Space Mono&#39;,monospace;">✕
+          удалить</button>
+      </div>
+    </div>
+
+    <!-- Format -->
+    <div class="section">
+      <div class="section-label">Формат</div>
+      <div class="option-grid" id="formatGroup">
+        <button class="opt-btn active" data-val="16:9" onclick="selectOpt(this,&#39;formatGroup&#39;)"><span
+            class="icon">⬛</span>16:9 YouTube</button>
+        <button class="opt-btn" data-val="9:16" onclick="selectOpt(this,&#39;formatGroup&#39;)"><span
+            class="icon">▌</span>9:16 TikTok</button>
+        <button class="opt-btn" data-val="1:1" onclick="selectOpt(this,&#39;formatGroup&#39;)"><span
+            class="icon">◼</span>1:1 Квадрат</button>
+        <button class="opt-btn" data-val="21:9" onclick="selectOpt(this,&#39;formatGroup&#39;)" id="btn219"
+          style="display:none;"><span class="icon">▬</span>21:9 Кино</button>
+      </div>
+    </div>
+
+    <!-- Duration -->
+    <div class="section">
+      <div class="section-label">Длительность</div>
+      <div class="option-grid" id="durationGroup">
+        <button class="opt-btn active" data-val="5"
+          onclick="selectOpt(this,&#39;durationGroup&#39;); updateMultishot()">5 сек</button>
+        <button class="opt-btn" data-val="10" onclick="selectOpt(this,&#39;durationGroup&#39;); updateMultishot()">10
+          сек</button>
+        <button class="opt-btn" data-val="15" onclick="selectOpt(this,&#39;durationGroup&#39;); updateMultishot()"
+          id="dur15">15 сек</button>
+      </div>
+    </div>
+
+    <!-- Multi-shot mode selector (appears for 10/15 sec) -->
+    <div class="section" id="modeSection" style="display:none;">
+      <div class="section-label">Режим съёмки</div>
+      <div class="multishot-switch gen-tabs">
+        <button class="gen-tab active" onclick="setMode(&#39;single&#39;, this)">◎ Единый кадр</button>
+        <button class="gen-tab" onclick="setMode(&#39;multi&#39;, this)">⊞ Multi-Shot</button>
+      </div>
+    </div>
+
+    <!-- Single prompt -->
+    <div class="section" id="singleSection">
+      <div class="section-label" id="promptLabel">Сцена</div>
+      <div class="prompt-wrap">
+        <textarea id="mainPrompt" placeholder="Опишите сцену, персонажа и действие...
+Например: Девушка в белом платье медленно поднимается над водой в закатном свете, кинематографическое освещение"
+          rows="5"></textarea>
+        <div class="char-counter"><span id="charCount">0</span> / 600</div>
+        <div class="prompt-actions">
+          <span class="prompt-tag" onclick="insertTag(&#39;Cinematic lighting&#39;)">🎬 Cinematic</span>
+          <span class="prompt-tag" onclick="insertTag(&#39;4K ultra-detailed&#39;)">📐 4K</span>
+          <span class="prompt-tag" onclick="insertTag(&#39;slow motion&#39;)">⏱ Slow-mo</span>
+          <span class="prompt-tag" onclick="insertTag(&#39;drone shot&#39;)">🚁 Drone</span>
+          <span class="prompt-tag" onclick="insertTag(&#39;golden hour&#39;)">🌅 Golden hour</span>
+          <span class="prompt-tag" onclick="insertTag(&#39;shallow depth of field&#39;)">📷 DOF</span>
+          <button class="btn-enhance" onclick="enhancePrompt()" id="enhanceBtn">
+            <span>✦</span> Улучшить AI
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multi-shot builder -->
+    <div class="section" id="multishotSection" style="display:none;">
+      <div class="section-label">Режиссура по кадрам</div>
+      <div id="shotsContainer">
+        <div class="shot-card">
+          <div class="shot-header">
+            <div class="shot-num">1</div>
+            <span class="shot-time">0–5 сек</span>
+          </div>
+          <textarea placeholder="Опишите кадр 1: персонаж, действие, камера..." rows="3"></textarea>
+        </div>
+      </div>
+      <button class="add-shot-btn" onclick="addShot()">+ Добавить кадр</button>
+    </div>
+
+    <!-- Engine-specific params -->
+    <div class="section">
+      <div class="section-label">Параметры движка</div>
+
+      <!-- Kling params -->
+      <div class="engine-panel visible" id="params-kling">
+        <div class="engine-params">
+          <div class="param-group">
+            <div class="param-label">Режим камеры</div>
+            <select class="param-select" id="kling-camera">
+              <option value="">Авто (по промпту)</option>
+              <option value="Zoom In, slow zoom into subject">Zoom In</option>
+              <option value="Pan left to right, smooth tracking">Pan →</option>
+              <option value="Tracking Shot, follow subject">Tracking Shot</option>
+              <option value="Aerial drone shot, descending">Aerial Drone</option>
+              <option value="Dutch angle, tilted camera">Dutch Angle</option>
+              <option value="Handheld, documentary style">Handheld</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Качество</div>
+            <select class="param-select" id="kling-quality">
+              <option value="standard">Standard (быстро)</option>
+              <option value="professional" selected="">Professional (HD)</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Стиль</div>
+            <select class="param-select" id="kling-style">
+              <option value="">По умолчанию</option>
+              <option value="Cinematic film look, anamorphic lens">Кинематограф</option>
+              <option value="Anime style, vibrant colors">Аниме</option>
+              <option value="Realistic documentary style">Документальный</option>
+              <option value="Studio photography lighting">Студийный</option>
+              <option value="Cyberpunk neon aesthetic">Киберпанк</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Интенсивность движения</div>
+            <select class="param-select" id="kling-motion">
+              <option value="">Авто</option>
+              <option value="subtle movement, barely perceptible motion">Минимум</option>
+              <option value="moderate natural movement">Умеренное</option>
+              <option value="dynamic energetic movement">Динамичное</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Veo params -->
+      <div class="engine-panel" id="params-veo">
+        <div class="engine-params">
+          <div class="param-group">
+            <div class="param-label">Режим съёмки</div>
+            <select class="param-select" id="veo-shot">
+              <option value="">Авто</option>
+              <option value="Close-up shot">Крупный план</option>
+              <option value="Wide establishing shot">Широкий план</option>
+              <option value="Medium shot, waist up">Средний план</option>
+              <option value="Extreme close-up, macro details">Макро</option>
+              <option value="Bird&#39;s eye view, top-down">Вид сверху</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Стиль</div>
+            <select class="param-select" id="veo-style">
+              <option value="">По умолчанию</option>
+              <option value="Photorealistic, 8K, highly detailed">Фотореализм 8K</option>
+              <option value="Watercolor painting style, artistic">Акварель</option>
+              <option value="3D animation, Pixar-like style">3D анимация</option>
+              <option value="Vintage film, 16mm grain">Vintage Film</option>
+              <option value="Black and white, high contrast">Ч/Б кино</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Освещение</div>
+            <select class="param-select" id="veo-light">
+              <option value="">Авто</option>
+              <option value="Dramatic chiaroscuro lighting">Кьяроскуро</option>
+              <option value="Soft diffused natural light">Мягкий свет</option>
+              <option value="Neon accent lighting, colored gels">Неоновый</option>
+              <option value="Backlit, silhouette effect">Контровой</option>
+              <option value="Golden hour warm sunlight">Золотой час</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Движение камеры</div>
+            <select class="param-select" id="veo-camera">
+              <option value="">Статичная камера</option>
+              <option value="Dolly zoom, Hitchcock effect">Dolly Zoom</option>
+              <option value="Slow pan, sweeping landscape">Панорама</option>
+              <option value="Steadicam follow shot">Steadicam</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seedance params -->
+      <div class="engine-panel" id="params-seedance">
+        <div class="engine-params">
+          <div class="param-group">
+            <div class="param-label">Жанр</div>
+            <select class="param-select" id="sd-genre">
+              <option value="">Без жанра</option>
+              <option value="Action sequence, fast cuts, dynamic">Экшн</option>
+              <option value="Romance, soft focus, warm tones">Романтика</option>
+              <option value="Thriller, dark atmosphere, tension">Триллер</option>
+              <option value="Fantasy epic, magical effects">Фэнтези</option>
+              <option value="Sci-fi futuristic, tech aesthetic">Sci-Fi</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Темп монтажа</div>
+            <select class="param-select" id="sd-pace">
+              <option value="">Авто</option>
+              <option value="slow paced, contemplative rhythm">Медленный</option>
+              <option value="normal paced, balanced rhythm">Нормальный</option>
+              <option value="fast paced, energetic cuts">Быстрый</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Эффекты</div>
+            <select class="param-select" id="sd-fx">
+              <option value="">Без эффектов</option>
+              <option value="particle effects, magical sparkles">Частицы</option>
+              <option value="lens flare, light leaks">Lens Flare</option>
+              <option value="smoke and fog atmosphere">Туман/Дым</option>
+              <option value="rain, wet surfaces, reflections">Дождь</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <div class="param-label">Цветовая схема</div>
+            <select class="param-select" id="sd-color">
+              <option value="">Авто</option>
+              <option value="warm golden tones, orange teal palette">Warm / Teal</option>
+              <option value="desaturated muted tones, film noir palette">Desaturated</option>
+              <option value="vibrant saturated colors, vivid palette">Vivid</option>
+              <option value="pastel soft palette, gentle tones">Pastel</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced -->
+    <div class="section">
+      <div class="advanced-toggle" onclick="toggleAdvanced(this)">
+        <span>⚙</span> Дополнительно (негативный промпт, тег кадра)
+        <span class="toggle-arrow">▾</span>
+      </div>
+      <div class="advanced-body" id="advancedBody">
+        <div class="param-label" style="margin-bottom:8px;">Негативный промпт</div>
+        <textarea class="neg-prompt"
+          id="negPrompt">morphing, distortion, bad anatomy, extra limbs, floating objects, text overlay, blurry, low resolution, static image, deformed hands, watermark, glitch artifacts</textarea>
+
+        <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border2);">
+          <div class="param-label" style="margin-bottom:8px;">AI Провайдер (для кнопки Улучшить)</div>
+          <select class="param-select" id="aiProvider" onchange="toggleApiKey()">
+            <option value="groq" selected>Groq 70B (Бесплатно - Вшитый ключ)</option>
+            <option value="gemini">Google Gemini (Бесплатно - Нужен ключ)</option>
+            <option value="claude">Anthropic Claude (Платный)</option>
+          </select>
+
+          <div class="param-label" style="margin-top:12px; margin-bottom:8px;">API Key <span id="apiKeyHelp"
+              style="opacity:0.6;font-weight:400;">(Get from Google AI Studio)</span></div>
+          <input type="password" id="apiKeyInput" placeholder="Введите ваш API Key..."
+            style="width:100%;padding:9px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;outline:none;transition:border-color 0.2s;"
+            onchange="saveApiKey(this.value)">
+        </div>
+
+        <div class="param-label" style="margin-bottom:8px; margin-top:16px;">Seed (опционально)</div>
+        <input type="number" id="seedInput" placeholder="Авто (случайный)"
+          style="width:100%;padding:9px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;outline:none;transition:border-color 0.2s;"
+          onfocus="this.style.borderColor='rgba(0,212,255,0.3)'" onblur="this.style.borderColor='var(--border2)'">
+      </div>
+    </div>
+
+    <!-- Generate button -->
+    <button class="generate-btn" onclick="generatePrompt()" id="generateBtn">
+      <div class="btn-inner">
+        <div class="spinner"></div>
+        <span class="btn-label"></span>
+      </div>
+    </button>
+
+    <!-- Output -->
+    <div class="output-section" id="outputSection">
+      <div class="output-box">
+        <div class="output-header">
+          <span>Готовый промпт</span>
+          <span class="output-badge" id="engineBadge">KLING 3.0</span>
+        </div>
+        <div class="output-text" id="outputText"></div>
+        <div class="output-meta" id="outputMeta"></div>
+        <div class="output-actions">
+          <button class="btn-copy" onclick="copyPrompt(&#39;outputText&#39;, this)">⎘ Копировать промпт</button>
+          <button class="btn-copy" id="copyNegBtn" onclick="copyNegative(this)">⎘ Копировать негативный</button>
+          <button class="btn-copy" onclick="resetAll()">↺ Сбросить</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ─── State ──────────────────────────────────────────────
+    let state = {
+      engine: 'kling',
+      genType: 'text',
+      format: '16:9',
+      duration: '5',
+      mode: 'single',
+      shots: [{ time: '0-5с', desc: '' }, { time: '5-10с', desc: '' }, { time: '10-15с', desc: '' }],
+      imageFile: null,
+      generated: null
+    };
+
+    const NEG_DEFAULTS = {
+      kling: 'morphing, distortion, bad anatomy, extra limbs, floating objects, text overlay, blurry, low resolution, static image, deformed hands, watermark, glitch artifacts',
+      veo: 'low quality, blurry, artifacts, text, watermark, bad composition, overexposed, underexposed, distorted proportions',
+      seedance: 'ugly, deformed, noisy, pixelated, low resolution, bad quality, watermark, duplicate, error, text on screen'
+    };
+
+    // ─── Engine ──────────────────────────────────────────────
+    function setEngine(eng, btn) {
+      state.engine = eng;
+      document.querySelectorAll('.engine-tab').forEach(t => {
+        t.classList.remove('active-k', 'active-v', 'active-s');
+      });
+      btn.classList.add(eng === 'kling' ? 'active-k' : eng === 'veo' ? 'active-v' : 'active-s');
+      document.querySelectorAll('.engine-panel').forEach(p => p.classList.remove('visible'));
+      document.getElementById('params-' + eng).classList.add('visible');
+      document.getElementById('negPrompt').value = NEG_DEFAULTS[eng];
+
+      // Kling only: 15 sec
+      const dur15 = document.getElementById('dur15');
+      const btn219 = document.getElementById('btn219');
+      if (eng === 'kling') {
+        dur15.style.display = '';
+        btn219.style.display = '';
+      } else if (eng === 'veo') {
+        dur15.style.display = '';
+        btn219.style.display = 'none';
+      } else {
+        dur15.style.display = 'none';
+        btn219.style.display = 'none';
+      }
+
+      // Update accent color
+      const root = document.documentElement;
+      if (eng === 'kling') {
+        root.style.setProperty('--active', '#00d4ff');
+        document.querySelector('.generate-btn').style.background = 'linear-gradient(135deg,#00b4d8,#0077b6)';
+      } else if (eng === 'veo') {
+        root.style.setProperty('--active', '#7c3aff');
+        document.querySelector('.generate-btn').style.background = 'linear-gradient(135deg,#7c3aff,#4c1d95)';
+      } else {
+        root.style.setProperty('--active', '#ff6b35');
+        document.querySelector('.generate-btn').style.background = 'linear-gradient(135deg,#ff6b35,#c2410c)';
+      }
+    }
+
+    // ─── Gen Type ────────────────────────────────────────────
+    function setGenType(type, btn) {
+      state.genType = type;
+      document.querySelectorAll('.gen-tab').forEach(t => {
+        if (t.parentElement.id !== 'modeSection' && t.closest('#modeSection') === null &&
+          t.closest('.multishot-switch') === null) {
+          t.classList.remove('active');
+        }
+      });
+      btn.classList.add('active');
+
+      const up = document.getElementById('uploadSection');
+      const pl = document.getElementById('promptLabel');
+      const ta = document.getElementById('mainPrompt');
+
+      if (type === 'image') {
+        up.style.display = '';
+        pl.textContent = 'Что оживить / изменить?';
+        ta.placeholder = 'Опишите движение или изменение...\nНапример: Девушка открывает глаза, волосы развеваются на ветру, лёгкая улыбка';
+      } else {
+        up.style.display = 'none';
+        pl.textContent = 'Сцена';
+        ta.placeholder = 'Опишите сцену, персонажа и действие...\nНапример: Девушка в белом платье медленно поднимается над водой в закатном свете, кинематографическое освещение';
+      }
+    }
+
+    // ─── Options ──────────────────────────────────────────────
+    function selectOpt(btn, groupId) {
+      const btns = document.getElementById(groupId).querySelectorAll('.opt-btn');
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (groupId === 'formatGroup') state.format = btn.dataset.val;
+      if (groupId === 'durationGroup') state.duration = btn.dataset.val;
+    }
+
+    // ─── Multi-shot ───────────────────────────────────────────
+    function updateMultishot() {
+      const dur = document.querySelector('#durationGroup .opt-btn.active')?.dataset.val || '5';
+      state.duration = dur;
+      const modeSection = document.getElementById('modeSection');
+      modeSection.style.display = dur === '5' ? 'none' : '';
+      if (dur === '5') {
+        setMode('single', null);
+      }
+      rebuildShots();
+    }
+
+    function setMode(mode, btn) {
+      state.mode = mode;
+      if (btn) {
+        const siblings = btn.parentElement.querySelectorAll('.gen-tab');
+        siblings.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      document.getElementById('singleSection').style.display = mode === 'single' ? '' : 'none';
+      document.getElementById('multishotSection').style.display = mode === 'multi' ? '' : 'none';
+      rebuildShots();
+    }
+
+    function rebuildShots() {
+      const dur = parseInt(state.duration);
+      const numShots = dur === 5 ? 1 : dur === 10 ? 2 : 3;
+      const times = ['0–5 сек', '5–10 сек', '10–15 сек'];
+      const existing = document.querySelectorAll('#shotsContainer .shot-card');
+      // preserve existing text
+      let saved = [];
+      existing.forEach((c, i) => saved[i] = c.querySelector('textarea').value);
+
+      const cont = document.getElementById('shotsContainer');
+      cont.innerHTML = '';
+      for (let i = 0; i < numShots; i++) {
+        const card = createShotCard(i + 1, times[i], saved[i] || '');
+        cont.appendChild(card);
+      }
+    }
+
+    function createShotCard(num, time, val) {
+      const card = document.createElement('div');
+      card.className = 'shot-card';
+      card.innerHTML = `
+    <div class="shot-header">
+      <div class="shot-num">${num}</div>
+      <span class="shot-time">${time}</span>
+    </div>
+    <textarea placeholder="Опишите кадр ${num}: персонаж, действие, камера..." rows="3">${val}</textarea>
+  `;
+      return card;
+    }
+
+    function addShot() {
+      const cont = document.getElementById('shotsContainer');
+      const n = cont.querySelectorAll('.shot-card').length + 1;
+      if (n > 5) return;
+      const card = createShotCard(n, `Кадр ${n}`, '');
+      cont.appendChild(card);
+    }
+
+    // ─── Advanced ────────────────────────────────────────────
+    function toggleAdvanced(btn) {
+      btn.classList.toggle('open');
+      document.getElementById('advancedBody').classList.toggle('visible');
+    }
+
+    // ─── Char counter ────────────────────────────────────────
+    document.getElementById('mainPrompt').addEventListener('input', function () {
+      document.getElementById('charCount').textContent = this.value.length;
+    });
+
+    // ─── Insert tag ──────────────────────────────────────────
+    function insertTag(tag) {
+      const ta = document.getElementById('mainPrompt');
+      const sep = ta.value.trim() ? ', ' : '';
+      ta.value += sep + tag;
+      document.getElementById('charCount').textContent = ta.value.length;
+    }
+
+    // ─── Enhance prompt ──────────────────────────────────────
+    // ─── Enhance prompt ──────────────────────────────────────
+    let apiKey = localStorage.getItem('vpe_api_key') || '';
+    if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
+
+    function saveApiKey(val) {
+      apiKey = val.trim();
+      localStorage.setItem('vpe_api_key', apiKey);
+    }
+
+    function toggleApiKey() {
+      const prov = document.getElementById('aiProvider').value;
+      const help = document.getElementById('apiKeyHelp');
+      const input = document.getElementById('apiKeyInput');
+
+      if (prov === 'groq') {
+        help.innerHTML = '<span style="color:#00d4ff">✨ Вшит бесплатный ключ (работает у всех)</span>';
+        input.placeholder = "Ключ вшит автоматически. Можно оставить пустым.";
+      } else if (prov === 'gemini') {
+        help.innerHTML = '<a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent-k)">Get Free Key</a>';
+        input.placeholder = "Введите ваш API Key...";
+      } else {
+        help.innerHTML = '<a href="https://console.anthropic.com/" target="_blank" style="color:var(--accent-k)">Get Key</a>';
+        input.placeholder = "Введите ваш API Key...";
+      }
+    }
+
+    async function enhancePrompt() {
+      const ta = document.getElementById('mainPrompt');
+      const text = ta.value.trim();
+      if (!text) { ta.placeholder = 'Сначала введите идею...'; return; }
+
+      const btn = document.getElementById('enhanceBtn');
+      btn.classList.add('loading');
+      btn.innerHTML = '<span>⏳</span> Улучшаю...';
+
+      const provider = document.getElementById('aiProvider').value;
+
+      try {
+        let improvedText = "";
+
+        // System prompt construction
+        const systemPrompt = `You are a professional video prompt engineer for AI video generators (${state.engine.toUpperCase()}).
+Expand and improve this short video idea into a detailed, cinematic prompt.
+Structure: [Subject/Character] + [Action/Motion] + [Camera Movement] + [Lighting] + [Style/Mood] + [Technical quality].
+Keep it under 200 words. Write ONLY the improved prompt, no explanations.
+Engine: ${state.engine}
+Format: ${state.format} ${state.duration}s
+Original idea: "${text}"`;
+
+        if (provider === 'gemini') {
+          if (!apiKey) throw new Error("No API Key");
+          improvedText = await callGemini(systemPrompt);
+        } else if (provider === 'groq') {
+          // Use user key if provided, otherwise use hardcoded free key
+          const keyToUse = apiKey || "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";
+          improvedText = await callGroq(systemPrompt, keyToUse);
+        } else {
+          // Claude (Anthropic)
+          if (!apiKey) throw new Error("No API Key");
+
+          const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+              model: 'claude-3-haiku-20240307',
+              max_tokens: 1000,
+              messages: [{ role: 'user', content: systemPrompt }]
+            })
+          });
+          const data = await response.json();
+          if (data.error) throw new Error(data.error.message);
+          improvedText = data.content?.[0]?.text;
+        }
+
+        if (improvedText) {
+          ta.value = improvedText.trim();
+          document.getElementById('charCount').textContent = ta.value.length;
+        }
+      } catch (e) {
+        console.error(e);
+        // Fallback enhancement
+        const additions = {
+          kling: 'Cinematic lighting, 4K ultra-detailed, realistic textures, professional color grading',
+          veo: 'Photorealistic 8K, precise motion dynamics, film-quality composition',
+          seedance: 'High fidelity, dynamic movement, rich color palette, professional grade'
+        };
+        const suffix = (!apiKey) ? " (API Key missing - using fallback)" : " (API Error - using fallback)";
+        ta.value = text + '. ' + additions[state.engine];
+        document.getElementById('charCount').textContent = ta.value.length;
+        alert("AI Error: " + e.message + "\nUsing simple fallback.");
+      }
+
+      btn.classList.remove('loading');
+      btn.innerHTML = '<span>✦</span> Улучшить AI';
+    }
+
+    async function callGemini(prompt) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    }
+
+    async function callGroq(prompt, key) {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${key}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+          max_tokens: 1000
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+      return data.choices?.[0]?.message?.content || "";
+    }
+
+
+
+    // ─── File upload ──────────────────────────────────────────
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      state.imageFile = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('imagePreview').style.display = '';
+        document.querySelector('.upload-zone').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeImage() {
+      state.imageFile = null;
+      document.getElementById('imagePreview').style.display = 'none';
+      document.querySelector('.upload-zone').style.display = '';
+      document.getElementById('fileInput').value = '';
+    }
+
+    // ─── Generate ─────────────────────────────────────────────
+    async function generatePrompt() {
+      const btn = document.getElementById('generateBtn');
+      btn.classList.add('loading');
+
+      // Collect inputs
+      const mainText = document.getElementById('mainPrompt').value.trim();
+      const negText = document.getElementById('negPrompt').value.trim();
+
+      let userPrompt = '';
+
+      if (state.mode === 'multi') {
+        const shotCards = document.querySelectorAll('#shotsContainer .shot-card');
+        const shots = [];
+        shotCards.forEach((c, i) => {
+          const val = c.querySelector('textarea').value.trim();
+          if (val) shots.push(`Shot ${i + 1}: ${val}`);
+        });
+        userPrompt = shots.join(' | ');
+      } else {
+        userPrompt = mainText;
+      }
+
+      if (!userPrompt) {
+        document.getElementById('mainPrompt').style.borderColor = 'rgba(255,80,80,0.5)';
+        setTimeout(() => document.getElementById('mainPrompt').style.borderColor = '', 2000);
+        btn.classList.remove('loading');
+        return;
+      }
+
+      // Engine-specific params
+      let params = '';
+      if (state.engine === 'kling') {
+        params = [
+          document.getElementById('kling-camera').value,
+          document.getElementById('kling-quality').value === 'professional' ? 'Professional quality, cinematic grade' : '',
+          document.getElementById('kling-style').value,
+          document.getElementById('kling-motion').value
+        ].filter(Boolean).join(', ');
+      } else if (state.engine === 'veo') {
+        params = [
+          document.getElementById('veo-shot').value,
+          document.getElementById('veo-style').value,
+          document.getElementById('veo-light').value,
+          document.getElementById('veo-camera').value
+        ].filter(Boolean).join(', ');
+      } else {
+        params = [
+          document.getElementById('sd-genre').value,
+          document.getElementById('sd-pace').value,
+          document.getElementById('sd-fx').value,
+          document.getElementById('sd-color').value
+        ].filter(Boolean).join(', ');
+      }
+
+      const seed = document.getElementById('seedInput').value;
+      const engineLabels = { kling: 'Kling 3.0', veo: 'Veo 3.1', seedance: 'Seedance 2' };
+
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{
+              role: 'user',
+              content: `You are a professional video prompt engineer specialized in ${engineLabels[state.engine]}.
+
+Create an optimized video generation prompt based on:
+- Engine: ${engineLabels[state.engine]}
+- Mode: ${state.genType === 'image' ? 'Image to Video' : 'Text to Video'}
+- Format: ${state.format}
+- Duration: ${state.duration} seconds
+- Shot mode: ${state.mode}
+- User idea: "${userPrompt}"
+${params ? `- Style params: ${params}` : ''}
+${state.mode === 'multi' ? '- This is multi-shot: keep clear transitions between shots' : ''}
+
+Generate ONE polished, production-ready prompt optimized for ${engineLabels[state.engine]}'s architecture.
+Include: subject, action, camera movement, lighting quality, atmosphere, technical specs.
+For Kling: include specific camera directives like [[zoom in]], [[pan]], timing cues.
+For Veo: emphasize motion realism and physics accuracy.
+For Seedance: emphasize narrative flow and dynamic composition.
+
+Write ONLY the final prompt (no explanations, no "Here is:", no quotes). Max 250 words.`
+            }]
+          })
+        });
+        const data = await response.json();
+        let finalPrompt = data.content?.[0]?.text?.trim() || buildFallbackPrompt(userPrompt, params);
+        showOutput(finalPrompt, negText, engineLabels[state.engine]);
+      } catch (e) {
+        const fallback = buildFallbackPrompt(userPrompt, params);
+        showOutput(fallback, negText, engineLabels[state.engine]);
+      }
+
+      btn.classList.remove('loading');
+    }
+
+    function buildFallbackPrompt(userPrompt, params) {
+      const quality = {
+        kling: 'Cinematic lighting, 4K ultra-detailed, realistic textures, professional color grading, smooth motion',
+        veo: 'Photorealistic 8K, precise motion dynamics, film-quality composition, natural physics',
+        seedance: 'High fidelity, dynamic movement, rich color palette, professional grade, crisp detail'
+      }[state.engine];
+      return [userPrompt, params, quality].filter(Boolean).join('. ');
+    }
+
+    function showOutput(prompt, neg, engineLabel) {
+      const out = document.getElementById('outputSection');
+      document.getElementById('outputText').textContent = prompt;
+      document.getElementById('engineBadge').textContent = engineLabel.toUpperCase();
+
+      const meta = document.getElementById('outputMeta');
+      meta.innerHTML = '';
+      const tags = [state.format, state.duration + ' сек', state.mode === 'multi' ? 'Multi-Shot' : 'Single Shot', state.genType === 'image' ? 'Image→Video' : 'Text→Video'];
+      tags.forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'meta-tag';
+        span.textContent = t;
+        meta.appendChild(span);
+      });
+
+      out.classList.add('visible');
+      state.generated = { prompt, neg };
+      out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ─── Copy ─────────────────────────────────────────────────
+    function copyPrompt(id, btn) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '✓ Скопировано!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '⎘ Копировать промпт'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    function copyNegative(btn) {
+      const neg = document.getElementById('negPrompt').value;
+      navigator.clipboard.writeText(neg).then(() => {
+        btn.textContent = '✓ Скопировано!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '⎘ Копировать негативный'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    function resetAll() {
+      document.getElementById('outputSection').classList.remove('visible');
+      document.getElementById('mainPrompt').value = '';
+      document.getElementById('charCount').textContent = '0';
+    }
+
+    // ─── Init ────────────────────────────────────────────────
+    rebuildShots();
+    setTimeout(toggleApiKey, 500); // Initialize UI state
+  </script>
+
+
+</body>
+
+</html>

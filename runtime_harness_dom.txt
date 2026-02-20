@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>done</title></head>
+<body>
+<pre id="report">PASS | element #mainSubject
+PASS | element #promptOutput
+PASS | element #copyPromptBtn
+PASS | element #saveBtn
+PASS | element #resetBtn
+PASS | element #copyJsonBtn
+PASS | element #referenceImages
+PASS | element #negativePrompt
+PASS | element #seedInput
+PASS | input mainSubject event
+PASS | click aiModel stable-diffusion
+PASS | click aspectRatio 16:9
+PASS | switch format structured
+PASS | call updateAll()
+PASS | promptOutput not empty | len=82
+PASS | format label changed | Structured (Структурный)</pre>
+<iframe id="app" src="file:///C:/Users/TOT/Documents/Grav4/vpe_test.html" style="width:1600px;height:2400px;border:0"></iframe>
+<script>
+(function () {
+  const report = document.getElementById('report');
+  const frame = document.getElementById('app');
+  const out = [];
+  function log(name, ok, details) {
+    out.push((ok ? 'PASS' : 'FAIL') + ' | ' + name + (details ? ' | ' + details : ''));
+  }
+  function done() {
+    report.textContent = out.join('\n');
+    document.title = 'done';
+  }
+  frame.addEventListener('load', async () => {
+    try {
+      await new Promise(r => setTimeout(r, 1800));
+      const w = frame.contentWindow;
+      const d = frame.contentDocument;
+      const mustIds = ['mainSubject', 'promptOutput', 'copyPromptBtn', 'saveBtn', 'resetBtn', 'copyJsonBtn', 'referenceImages', 'negativePrompt', 'seedInput'];
+      mustIds.forEach(id => log('element #' + id, !!d.getElementById(id)));
+
+      const subj = d.getElementById('mainSubject');
+      if (subj) {
+        subj.value = 'test runtime subject';
+        subj.dispatchEvent(new Event('input', { bubbles: true }));
+        log('input mainSubject event', true);
+      } else {
+        log('input mainSubject event', false, 'missing #mainSubject');
+      }
+
+      const aiBtn = d.querySelector('[data-group="aiModel"][data-value="stable-diffusion"]');
+      if (aiBtn) { aiBtn.click(); log('click aiModel stable-diffusion', true); }
+      else { log('click aiModel stable-diffusion', false, 'button not found'); }
+
+      const arBtn = d.querySelector('[data-group="aspectRatio"][data-value="16:9"]');
+      if (arBtn) { arBtn.click(); log('click aspectRatio 16:9', true); }
+      else { log('click aspectRatio 16:9', false, 'button not found'); }
+
+      const fmtBtn = d.querySelector('.format-tab[data-format="structured"]');
+      if (fmtBtn) { fmtBtn.click(); log('switch format structured', true); }
+      else { log('switch format structured', false, 'button not found'); }
+
+      if (w && typeof w.updateAll === 'function') {
+        w.updateAll();
+        log('call updateAll()', true);
+      } else {
+        log('call updateAll()', false, 'function missing');
+      }
+
+      await new Promise(r => setTimeout(r, 600));
+      const prompt = (d.getElementById('promptOutput')?.textContent || '').trim();
+      log('promptOutput not empty', prompt.length > 0, 'len=' + prompt.length);
+
+      const fmtLabel = (d.getElementById('promptFormatLabel')?.textContent || '').trim();
+      log('format label changed', fmtLabel.toLowerCase().includes('structured'), fmtLabel);
+    } catch (e) {
+      log('runtime exception', false, String(e && e.message || e));
+    }
+    done();
+  });
+})();
+</script>
+
+
+</body></html>

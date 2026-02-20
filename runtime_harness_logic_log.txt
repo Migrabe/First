@@ -1,0 +1,14 @@
+[42428:45772:0219/074942.733:ERROR:google_apis\gcm\engine\registration_request.cc:290] Registration response error message: PHONE_REGISTRATION_ERROR
+[42428:45772:0219/074942.793:ERROR:google_apis\gcm\engine\registration_request.cc:290] Registration response error message: PHONE_REGISTRATION_ERROR
+[42428:45772:0219/074942.794:ERROR:google_apis\gcm\engine\registration_request.cc:290] Registration response error message: PHONE_REGISTRATION_ERROR
+[42428:45772:0219/074942.866:ERROR:google_apis\gcm\engine\mcs_client.cc:700]   Error code: 401  Error message: Authentication Failed: wrong_secret
+[42428:45772:0219/074942.866:ERROR:google_apis\gcm\engine\mcs_client.cc:702] Failed to log in to GCM, resetting connection.
+Created TensorFlow Lite XNNPACK delegate for CPU.
+[4[15608:43856:0219/075015.336:ERROR:google_apis\gcm\engine\registration_request.cc:290] Registration response error message: DEPRECATED_ENDPOINT[4[15608:9424:0219/093234.046:ERROR:components\device_event_log\device_event_log_impl.cc:202] [09:32:34.047] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: Элемент не найден. (0x490)
+[15608:9424:0219/120032.824:ERROR:components\device_event_log\device_event_log_impl.cc:202] [12:00:32.824] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: Элемент не найден. (0x490)
+[15608:9424:0220/063841.293:ERROR:components\device_event_log\device_event_log_impl.cc:202] [06:38:41.294] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: Элемент не найден. (0x490)
+failed: Элемент не найден. (0x490)
+[45044:42268:0220/063841.294:ERROR:components\device_event_log\device_event_log_impl.cc:202] [06:38:41.294] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: Элемент не найден. (0x490)
+�ен. (0x490)
+[42428:45772:0220/035020.134:ERROR:google_apis\gcm\engine\mcs_client.cc:748] Received close command, resetting connection.
+[42428:41756:0220/063841.294:ERROR:components\device_event_log\device_event_log_impl.cc:202] [06:38:41.295] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: Элемент не найден. (0x490)

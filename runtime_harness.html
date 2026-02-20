@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>VPE Runtime Logic Harness</title>
+  <style>
+    body {
+      background: #1a1a1a;
+      color: #eee;
+      font-family: monospace;
+      padding: 20px;
+    }
+
+    .pass {
+      color: #0f0;
+    }
+
+    .fail {
+      color: #f00;
+      font-weight: bold;
+    }
+
+    .test-case {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #2a2a2a;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>VPE Runtime Logic Verification</h1>
+  <div id="status">Running tests...</div>
+  <div id="results"></div>
+
+  <script>
+    // ==========================================
+    // MOCKS & CONSTANTS
+    // ==========================================
+    const $ = (id) => ({ value: "", checked: false, style: {}, classList: { add: () => { }, remove: () => { }, toggle: () => { } }, innerHTML: "", textContent: "" }); // Mock DOM helper
+
+    let state = {
+      aiModel: "", cameraBody: "", aspectRatio: "", resolution: "", purpose: "", format: "", medium: "", photoStyle: "", cinemaStyle: "", directorStyle: "", artStyle: "", filmStock: "",
+      lens: "", focalLength: "", aperture: "", angle: "", shotSize: "", composition: "", quality: "",
+      mood: "", lightType: { primary: "", accent: "" }, timeOfDay: { primary: "", accent: "" },
+      lightFX: [], colorPalette: "", skinDetail: [], hairDetail: [], material: [], typography: [],
+      referenceType: "", referenceWeight: 50, mainSubject: "", textContent: "", negativePrompt: "",
+      quickStyle: "", fashionFoodStyle: "", emotion: "",
+      generateFourMode: false, grid3x3Mode: false, maxConsistency: false, beforeAfter: false, seamlessPattern: false, seed: "",
+      mjVersion: "6.1", mjStyle: "", mjStylize: 250, mjChaos: 0, mjWeird: 0,
+      sdCfg: 7, sdSteps: 25, fluxModel: "dev", fluxGuidance: 3.5, fluxSteps: 28, dalleStyle: "vivid", dalleQuality: "hd",
+      skinRenderBoost: false, hairRenderBoost: false, referenceImages: [], promptFormat: "flat"
+    };
+
+    const FILM_STOCKS = {
+      "Kodak Vision3 500T": "shot on Kodak Vision3 500T 5219 film stock",
+      "Fujifilm Eterna 500T": "shot on Fujifilm Eterna 500T"
+    };
+    const QUICK_STYLES = { "true-detective": "True Detective HBO noir cinematography aesthetic..." };
+    const FASHION_FOOD_STYLES = { "gucci-retro": "Gucci campaign aesthetic..." };
+    const EMOTIONS = { "Euphoria": "(genuine euphoria:1.3)..." };
+
+    var CHATGPT_STYLE_MAP = {
+      "in the style of Annie Leibovitz, dramatic portrait lighting, rich colors": "dramatic editorial portrait, rich warm saturated colors, deep shadows with golden highlights, intimate cinematic composition"
+    };
+
+    // ==========================================
+    // LOGIC FUNCTIONS (Extracted from VPE)
+    // ==========================================
+
+    function buildG4ForNBP(basePromptText) {
+      const subject = state.mainSubject || "the subject";
+      const cam = [state.cameraBody, state.lens, state.aperture].filter(Boolean).join(", ");
+      // Simplified logic for harness
+      const lightParts = [];
+      if (state.lightType.primary) lightParts.push(state.lightType.primary + " as key light");
+      state.lightFX.forEach(fx => lightParts.push(fx));
+      const lighting = lightParts.join(", ") || "natural lighting";
+
+      const g4 = {
+        task: "GENERATE_SCENE_VARIATIONS",
+        base_scene: { subject: subject, lighting: lighting },
+        variations: [
+          { id: 1, shot_type: "Low angle" },
+          { id: 2, shot_type: "Cowboy shot" },
+          { id: 3, shot_type: "Dutch angle" },
+          { id: 4, shot_type: "Three-quarter from left" }
+        ]
+      };
+      return JSON.stringify(g4);
+    }
+
+    function buildFlatPrompt() {
+      const parts = [];
+      if (state.purpose) parts.push(state.purpose);
+      if (state.format) parts.push(state.format);
+
+      // ChatGPT logic
+      var _cg = state.aiModel === "chatgpt-image";
+      if (state.photoStyle) parts.push(_cg ? (CHATGPT_STYLE_MAP[state.photoStyle] || state.photoStyle) : state.photoStyle);
+
+      let finalPrompt = "Generate an image.\n";
+      if (state.mainSubject) finalPrompt += `subject: ${state.mainSubject.trim()}\n`;
+      if (parts.length) finalPrompt += parts.join(", ");
+
+      return finalPrompt;
+    }
+
+    // ==========================================
+    // TESTS
+    // ==========================================
+    const results = document.getElementById("results");
+    function assert(desc, condition) {
+      const div = document.createElement("div");
+      div.className = "test-case " + (condition ? "pass" : "fail");
+      div.textContent = (condition ? "[PASS] " : "[FAIL] ") + desc;
+      results.appendChild(div);
+      return condition;
+    }
+
+    function runTests() {
+      try {
+        // TEST 1: NBP JSON Structure
+        state.aiModel = "nano-banana-pro";
+        state.generateFourMode = true;
+        state.mainSubject = "Test Subject";
+        const jsonOut = JSON.parse(buildG4ForNBP());
+        assert("NBP JSON: Output is valid JSON", typeof jsonOut === 'object');
+        assert("NBP JSON: Task is GENERATE_SCENE_VARIATIONS", jsonOut.task === "GENERATE_SCENE_VARIATIONS");
+        assert("NBP JSON: Has 4 variations", jsonOut.variations.length === 4);
+
+        // TEST 2: ChatGPT Style Mapping
+        state.aiModel = "chatgpt-image";
+        state.generateFourMode = false;
+        state.photoStyle = "in the style of Annie Leibovitz, dramatic portrait lighting, rich colors";
+        const chatPrompt = buildFlatPrompt();
+        assert("ChatGPT: Maps 'Annie Leibovitz' to description", chatPrompt.includes("dramatic editorial portrait"));
+        assert("ChatGPT: Does NOT contain original key", !chatPrompt.includes("Annie Leibovitz"));
+
+        // TEST 3: Default behavior
+        state.aiModel = "stable-diffusion";
+        state.photoStyle = "in the style of Annie Leibovitz, dramatic portrait lighting, rich colors";
+        const sdPrompt = buildFlatPrompt();
+        assert("Standard Model: Keeps original style name", sdPrompt.includes("Annie Leibovitz"));
+
+        document.getElementById("status").textContent = "Tests Completed.";
+
+      } catch (e) {
+        document.getElementById("status").textContent = "Error running tests: " + e.message;
+        console.error(e);
+      }
+    }
+
+    runTests();
+  </script>
+</body>
+
+</html>

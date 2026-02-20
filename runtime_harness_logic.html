@@ -1,0 +1,145 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>running</title></head>
+<body>
+<pre id="report">running...</pre>
+<iframe id="app" src="file:///C:/Users/TOT/Documents/Grav4/vpe_test.html" style="width:1600px;height:2800px;border:0"></iframe>
+<script>
+(async function () {
+  const out = [];
+  const log = (name, ok, details = '') => out.push((ok ? 'PASS' : 'FAIL') + ' | ' + name + (details ? ' | ' + details : ''));
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  const rep = document.getElementById('report');
+  const frame = document.getElementById('app');
+
+  function makePngFile(w, name) {
+    // 1x1 PNG
+    const b64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Zf2QAAAAASUVORK5CYII=';
+    const bin = w.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new w.File([arr], name, { type: 'image/png' });
+  }
+
+  frame.addEventListener('load', async () => {
+    try {
+      await wait(2200);
+      const w = frame.contentWindow;
+      const d = frame.contentDocument;
+
+      // Collect notifications
+      const notices = [];
+      const origNotify = w.notify;
+      w.notify = function (msg, type) {
+        notices.push({ msg: String(msg || ''), type: type || 'success' });
+        return origNotify.call(this, msg, type);
+      };
+      const lastNotice = () => notices.length ? notices[notices.length - 1] : null;
+
+      // --- Test 1: edge-case empty input for copy/save ---
+      d.getElementById('promptOutput').textContent = 'Выберите параметры';
+      d.getElementById('copyPromptBtn').click();
+      await wait(80);
+      log('copyPrompt empty warns user', (lastNotice()?.msg || '').includes('Сначала соберите промпт'), lastNotice()?.msg || 'no notice');
+
+      d.getElementById('saveBtn').click();
+      await wait(80);
+      log('save empty warns user', (lastNotice()?.msg || '').includes('Нечего сохранять'), lastNotice()?.msg || 'no notice');
+
+      // --- Test 2: conflict logic quickStyle mutual exclusion ---
+      const qsBtn = d.querySelector('[data-group="quickStyle"][data-value="true-detective"]');
+      if (qsBtn) qsBtn.click();
+      await wait(220);
+      const photoBtn = d.querySelector('[data-group="photoStyle"]');
+      const disabledSections = d.querySelectorAll('.left-panel > .section.disabled-section').length;
+      log('quickStyle disables competing style buttons', !!photoBtn && photoBtn.disabled, photoBtn ? ('disabled=' + photoBtn.disabled) : 'photoStyle btn missing');
+      log('quickStyle disables multiple sections', disabledSections > 0, 'disabled sections=' + disabledSections);
+
+      // --- Test 3: maxConsistency without refs shows conflict warning ---
+      const maxConsistency = d.getElementById('maxConsistency');
+      if (maxConsistency) {
+        maxConsistency.checked = true;
+        maxConsistency.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      await wait(120);
+      const cwarn = d.getElementById('conflictWarnings');
+      const ctext = (cwarn?.textContent || '');
+      log('maxConsistency without refs warning visible', cwarn && cwarn.style.display !== 'none' && ctext.includes('консистентность'), 'display=' + (cwarn?.style.display || 'n/a'));
+
+      // --- Test 4: reference upload allowed engines, max 3 files ---
+      const aiStable = d.querySelector('[data-group="aiModel"][data-value="stable-diffusion"]');
+      if (aiStable) aiStable.click();
+      await wait(120);
+
+      const f1 = makePngFile(w, 'a.png');
+      const f2 = makePngFile(w, 'b.png');
+      const f3 = makePngFile(w, 'c.png');
+      const f4 = makePngFile(w, 'd.png');
+      w.handleImageUpload({ target: { files: [f1, f2, f3, f4], value: '' } });
+      await wait(1800);
+
+      const cards = d.querySelectorAll('.image-preview-card').length;
+      const previewVisible = d.getElementById('imagePreviewContainer')?.style.display === 'block';
+      log('reference upload truncates to 3 files', cards === 3, 'cards=' + cards);
+      log('reference preview visible after upload', previewVisible, 'display=' + (d.getElementById('imagePreviewContainer')?.style.display || 'n/a'));
+
+      // --- Test 5: Midjourney blocks refs upload ---
+      const aiMJ = d.querySelector('[data-group="aiModel"][data-value="midjourney"]');
+      if (aiMJ) aiMJ.click();
+      await wait(120);
+      const beforeCards = d.querySelectorAll('.image-preview-card').length;
+      w.handleImageUpload({ target: { files: [makePngFile(w, 'mj.png')], value: '' } });
+      await wait(180);
+      const afterCards = d.querySelectorAll('.image-preview-card').length;
+      log('midjourney blocks reference upload', (lastNotice()?.msg || '').includes('отключены для Midjourney'), lastNotice()?.msg || 'no notice');
+      log('midjourney upload does not add cards', afterCards === beforeCards, 'before=' + beforeCards + ', after=' + afterCards);
+
+      // --- Test 6: copy/save happy-path instrumentation ---
+      const copied = [];
+      w.safeCopy = function (text, label) { copied.push({ text: String(text || ''), label: String(label || '') }); };
+      d.getElementById('mainSubject').value = 'logic test subject';
+      d.getElementById('mainSubject').dispatchEvent(new Event('input', { bubbles: true }));
+      if (typeof w.updateAll === 'function') w.updateAll();
+      await wait(120);
+
+      d.getElementById('copyPromptBtn').click();
+      d.getElementById('copyJsonBtn').click();
+      await wait(100);
+      const hasPromptCopy = copied.some(x => x.label === 'Промпт' && x.text.trim().length > 0);
+      const hasJsonCopy = copied.some(x => x.label === 'JSON' && x.text.trim().startsWith('{'));
+      log('copyPrompt copies non-empty prompt', hasPromptCopy, 'copies=' + copied.length);
+      log('copyJson copies JSON payload', hasJsonCopy, 'copies=' + copied.length);
+
+      let saveClicked = 0;
+      const origCreateEl = d.createElement.bind(d);
+      d.createElement = function (tag) {
+        const el = origCreateEl(tag);
+        if (String(tag).toLowerCase() === 'a') {
+          const origClick = el.click.bind(el);
+          el.click = function () { saveClicked++; return origClick(); };
+        }
+        return el;
+      };
+      d.getElementById('saveBtn').click();
+      await wait(80);
+      log('save creates downloadable link click', saveClicked > 0, 'anchor clicks=' + saveClicked);
+
+      // --- Test 7: reset restores baseline ---
+      d.getElementById('resetBtn').click();
+      await wait(220);
+      const mainVal = d.getElementById('mainSubject')?.value || '';
+      const negVal = d.getElementById('negativePrompt')?.value || '';
+      const refsAfterReset = d.querySelectorAll('.image-preview-card').length;
+      const maxAfterReset = !!d.getElementById('maxConsistency')?.checked;
+      log('reset clears text fields', mainVal === '' && negVal === '', 'main=' + mainVal.length + ',neg=' + negVal.length);
+      log('reset clears refs previews', refsAfterReset === 0, 'cards=' + refsAfterReset);
+      log('reset clears maxConsistency checkbox', maxAfterReset === false, 'checked=' + maxAfterReset);
+
+    } catch (e) {
+      log('runtime exception', false, String(e && e.message || e));
+    }
+    rep.textContent = out.join('\n');
+    document.title = 'done';
+  });
+})();
+</script>
+</body></html>

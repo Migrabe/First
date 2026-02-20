@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>done</title></head>
+<body>
+<pre id="report">PASS | aiModelSection exists
+PASS | aiModel header exists
+PASS | header click toggles collapse | before=true,after1=false,after2=true
+PASS | mutual-exclusion applied for quickStyle | disabled sections=32
+PASS | applyConflictRules exposed</pre>
+<iframe id="app" src="file:///C:/Users/TOT/Documents/Grav4/vpe_test.html" style="width:1600px;height:2600px;border:0"></iframe>
+<script>
+(async function(){
+  const out=[]; const log=(n,ok,d='')=>out.push((ok?'PASS':'FAIL')+' | '+n+(d?(' | '+d):''));
+  const rep=document.getElementById('report'); const frame=document.getElementById('app');
+  frame.addEventListener('load', async ()=>{
+    try {
+      await new Promise(r=>setTimeout(r,1800));
+      const d=frame.contentDocument; const w=frame.contentWindow;
+
+      const target=d.getElementById('aiModelSection');
+      const hdr=target?.querySelector('.section-header');
+      log('aiModelSection exists', !!target);
+      log('aiModel header exists', !!hdr);
+      if (target && hdr) {
+        const before=target.classList.contains('collapsed');
+        hdr.click();
+        await new Promise(r=>setTimeout(r,120));
+        const after1=target.classList.contains('collapsed');
+        hdr.click();
+        await new Promise(r=>setTimeout(r,120));
+        const after2=target.classList.contains('collapsed');
+        log('header click toggles collapse', before!==after1 && after1!==after2, `before=${before},after1=${after1},after2=${after2}`);
+      }
+
+      const qsBtn=d.querySelector('[data-group="quickStyle"][data-value="true-detective"]');
+      if (qsBtn) {
+        qsBtn.click();
+        await new Promise(r=>setTimeout(r,250));
+        const disabledCount=d.querySelectorAll('.left-panel > .section.disabled-section').length;
+        log('mutual-exclusion applied for quickStyle', disabledCount>0, 'disabled sections='+disabledCount);
+      } else {
+        log('quickStyle button exists', false);
+      }
+
+      log('applyConflictRules exposed', typeof w.applyConflictRules==='function');
+    } catch(e){ log('runtime exception', false, String(e&&e.message||e)); }
+    rep.textContent=out.join('\n'); document.title='done';
+  });
+})();
+</script>
+
+</body></html>

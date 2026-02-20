@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html><head><title>done</title></head><body><pre id="r">has handler | false
+collapsed start | true
+collapsed after click | true
+collapsed after dispatchEvent | true</pre>
+<iframe id="app" src="file:///C:/Users/TOT/Documents/Grav4/vpe_test.html" style="width:1200px;height:2200px;border:0"></iframe>
+<script>
+const r=document.getElementById('r'); const out=[]; const log=(...a)=>out.push(a.join(' | '));
+app.addEventListener('load', async ()=>{
+  await new Promise(x=>setTimeout(x,1800));
+  const d=app.contentDocument;
+  const s=d.getElementById('aiModelSection');
+  const h=s.querySelector('.section-header');
+  log('has handler', !!h.__vpeCollapseHandler);
+  log('collapsed start', s.classList.contains('collapsed'));
+  if (h.__vpeCollapseHandler) {
+    h.__vpeCollapseHandler({target:h, closest:()=>null});
+    log('collapsed after direct handler', s.classList.contains('collapsed'));
+  }
+  h.click();
+  log('collapsed after click', s.classList.contains('collapsed'));
+  h.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+  log('collapsed after dispatchEvent', s.classList.contains('collapsed'));
+  r.textContent=out.join('\n'); document.title='done';
+});
+</script>
+</body></html>
